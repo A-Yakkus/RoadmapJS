@@ -1,0 +1,21 @@
+status{
+  font-size: 1.5em;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+  position: absolute;
+}
+
+.roadnode {
+  border: 1px solid black;
+  display: inline-block;
+  padding: 0px 10px;
+  margin:10px;
+  text-align: center;
+  white-space: pre;
+  position: relative;
+}
+
+.glow {
+  box-shadow:0px 0px 15px #FFFF00;
+}

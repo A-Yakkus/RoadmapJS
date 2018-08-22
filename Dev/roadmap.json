@@ -1,0 +1,39 @@
+[
+    {
+      "title":"base",
+      "description":"A basic node line 1",
+      "status":"complete",
+      "dependencies":null
+    },
+    {
+      "title":"newNode",
+      "description":"A second node depending on base",
+      "status":"incomplete",
+      "dependencies":["base"]
+    },
+    {
+      "title":"3rdNode",
+      "description":"A 3rd node",
+      "status":"incomplete",
+      "dependencies":["base","newNode"]
+    },
+    {
+      "title":"Node 4",
+      "description":"The final node\n with 2 lines and 2 dependencies",
+      "status":"incomplete",
+      "dependencies":["newNode", "row2 base2"]
+    },
+    {
+      "title":"base2",
+      "description":"A basic node\n This is a second line",
+      "status":"incomplete",
+      "dependencies":null
+    },
+    {
+      "title":"row2 base2",
+      "description":"A basic node",
+      "status":"incomplete",
+      "dependencies":["base2"]
+    }
+
+  ]
