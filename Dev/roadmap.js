@@ -1,29 +1,37 @@
 var root = document.getElementById("roadMap");
 function genRoadMap(){
-  getFile(root.dataset.roadmap, function(response) {
-    root.innerHTML = createRoadMapHTML(nodeTree(JSON.parse(response)));
-    var nodeElems = document.querySelectorAll(".roadNode");
-    var maxHeight=0;
-    for(var i in nodeElems){
+  if(!root){
+    console.log("RoadMap Root Element Not Found");
+  }
+  else if(root.dataset.roadmap==""||root.dataset.roadmap==null||root.dataset.roadmap=="undefined"){
+    console.log("roadmap file is not defined");
+  }
+  else {
+    getFile(root.dataset.roadmap, function(response) {
+      root.innerHTML = createRoadMapHTML(nodeTree(JSON.parse(response)));
+      var nodeElems = document.querySelectorAll(".roadNode");
+      var maxHeight=0;
+      for(var i in nodeElems){
       if(maxHeight<nodeElems[i].offsetHeight)
         maxHeight=nodeElems[i].offsetHeight;
-    }
-    nodeElems.forEach(function(elem){
-      elem.style.height=maxHeight+"px";
-      elem.addEventListener("mouseover", function(current){
-        var deps = elem.querySelectorAll(".dep");
-        deps.forEach(function(el){
-          document.getElementById(sanitize(el.innerText)).classList.add("glow");
+      }
+      nodeElems.forEach(function(elem){
+        elem.style.height=maxHeight+"px";
+        elem.addEventListener("mouseover", function(current){
+          var deps = elem.querySelectorAll(".dep");
+          deps.forEach(function(el){
+            document.getElementById(sanitize(el.innerText)).classList.add("glow");
+          });
         });
-      });
-      elem.addEventListener("mouseout", function(current){
-        var deps = elem.querySelectorAll(".dep");
-        deps.forEach(function(el){
-          document.getElementById(sanitize(el.innerText)).classList.remove("glow");
+        elem.addEventListener("mouseout", function(current){
+          var deps = elem.querySelectorAll(".dep");
+          deps.forEach(function(el){
+            document.getElementById(sanitize(el.innerText)).classList.remove("glow");
+          });
         });
       });
     });
-  });
+  }
 }
 
 //asynchronously obtains a file.
