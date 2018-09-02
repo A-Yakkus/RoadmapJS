@@ -7,34 +7,23 @@ function genRoadMap(){
     console.log("roadmap file is not defined");
   }
   else {
-    getFile(root.dataset.roadmap, function(response) {
-      root.innerHTML = createRoadMapHTML(nodeTree(JSON.parse(response)));
-      var nodeElems = document.querySelectorAll(".roadNode");
-      var maxHeight=0;
-      for(var i in nodeElems){
-      if(maxHeight<nodeElems[i].offsetHeight)
-        maxHeight=nodeElems[i].offsetHeight;
-      }
-      nodeElems.forEach(function(elem){
-        elem.style.height=maxHeight+"px";
-        elem.addEventListener("mouseover", function(current){
-          var deps = elem.querySelectorAll(".dep");
-          deps.forEach(function(el){
-            document.getElementById(sanitize(el.innerText)).classList.add("glow");
-          });
-        });
-        elem.addEventListener("mouseout", function(current){
-          var deps = elem.querySelectorAll(".dep");
-          deps.forEach(function(el){
-            document.getElementById(sanitize(el.innerText)).classList.remove("glow");
-          });
-        });
+
+    if(root.dataset.roadmap.indexOf(".json")>-1){
+      getFile(root.dataset.roadmap, function(response) {
+        root.innerHTML = createRoadMapHTML(nodeTree(JSON.parse(response)));
+        initElems(document.querySelectorAll(".roadNode"));
       });
-    });
+    }
+    else{
+      fetch(root.dataset.roadmap).then(response=>response.json()).then(function(jsonString){
+        root.innerHTML = createRoadMapHTML(nodeTree(JSON.parse(jsonString)));
+        initElems(document.querySelectorAll(".roadNode"));
+      });
+    }
   }
 }
 
-//asynchronously obtains a file.
+//asynchronously obtains a file as a json file.
 function getFile(filename, callback){
   var xobj = new XMLHttpRequest();
   xobj.overrideMimeType("application/json");
@@ -61,7 +50,7 @@ function nodeTree(json){
   var rootNodes = [];
   var p = 0;
   for(var i in json){
-    if(json[i].dependencies==null){
+    if(json[i].dependencies==null||(json[i].dependencies[0]==null&&json[i].dependencies.length==1)){
       rootNodes.push(json[i]);
       json.splice(i, 1);
     }
@@ -129,7 +118,9 @@ function createNodeHTMLObject(nodeObj) {
   var result = "";
   result+="<div id='"+sanitize(nodeObj.title)+"' class='roadnode'><div style='display:table-cell'><h3>"+nodeObj.title+"</h3><p>"+nodeObj.description+"<br/>";
   for(var j in nodeObj.dependencies) {
-    result+="Task depends on : <span class='dep'>"+nodeObj.dependencies[j]+"</span><br/>";
+    if(!(nodeObj.dependencies[j]=="null"||(nodeObj.dependencies[j]==null&&nodeObj.dependencies.length==1))){
+      result+="Task depends on : <span class='dep'>"+nodeObj.dependencies[j]+"</span><br/>";
+    }
   }
   result+="</p><br/><status>"+nodeObj.status+"</status></div></div>";
   return result;
@@ -148,6 +139,32 @@ function createRoadMapHTML(nodeList){
   return res;
 }
 
+/**
+ * Sanitizes strings for processing/html compliance
+ */
 function sanitize(str){
   return str.replace(" ", "");
+}
+
+function initElems(nodeElems){
+  var maxHeight=0;
+  for(var i in nodeElems){
+  if(maxHeight<nodeElems[i].offsetHeight)
+    maxHeight=nodeElems[i].offsetHeight;
+  }
+  nodeElems.forEach(function(elem){
+    elem.style.height=maxHeight+"px";
+    elem.addEventListener("mouseover", function(current){
+      var deps = elem.querySelectorAll(".dep");
+      deps.forEach(function(el){
+        document.getElementById(sanitize(el.innerText)).classList.add("glow");
+      });
+    });
+    elem.addEventListener("mouseout", function(current){
+      var deps = elem.querySelectorAll(".dep");
+      deps.forEach(function(el){
+        document.getElementById(sanitize(el.innerText)).classList.remove("glow");
+      });
+    });
+  });
 }
