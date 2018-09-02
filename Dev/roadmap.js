@@ -7,7 +7,6 @@ function genRoadMap(){
     console.log("roadmap file is not defined");
   }
   else {
-
     if(root.dataset.roadmap.indexOf(".json")>-1){
       getFile(root.dataset.roadmap, function(response) {
         root.innerHTML = createRoadMapHTML(nodeTree(JSON.parse(response)));
@@ -48,12 +47,16 @@ function getFile(filename, callback){
 function nodeTree(json){
   var nodeList=[];
   var rootNodes = [];
+  var rootIndexes = [];
   var p = 0;
   for(var i in json){
-    if(json[i].dependencies==null||(json[i].dependencies[0]==null&&json[i].dependencies.length==1)){
+    if(json[i].dependencies==null){
       rootNodes.push(json[i]);
-      json.splice(i, 1);
+      rootIndexes.unshift(i);
     }
+  }
+  for(var i in rootIndexes){
+    json.splice(rootIndexes[i], 1);
   }
   nodeList.push(rootNodes);
   while(json.length>0) {
@@ -118,9 +121,7 @@ function createNodeHTMLObject(nodeObj) {
   var result = "";
   result+="<div id='"+sanitize(nodeObj.title)+"' class='roadnode'><div style='display:table-cell'><h3>"+nodeObj.title+"</h3><p>"+nodeObj.description+"<br/>";
   for(var j in nodeObj.dependencies) {
-    if(!(nodeObj.dependencies[j]=="null"||(nodeObj.dependencies[j]==null&&nodeObj.dependencies.length==1))){
-      result+="Task depends on : <span class='dep'>"+nodeObj.dependencies[j]+"</span><br/>";
-    }
+    result+="Task depends on : <span class='dep'>"+nodeObj.dependencies[j]+"</span><br/>";
   }
   result+="</p><br/><status>"+nodeObj.status+"</status></div></div>";
   return result;
